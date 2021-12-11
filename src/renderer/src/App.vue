@@ -1,37 +1,59 @@
-<script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import HelloWorld from './components/HelloWorld.vue'
+<script lang="ts">
+import { defineComponent } from 'vue'
+  import {NCard,NTabs,NTabPane} from 'naive-ui'
+  export default defineComponent({
+    components: {
+    NCard,NTabs,NTabPane
+    },
+    setup() {
+      return {
+
+      }
+    }
+  })
 </script>
 
 <template>
-  <div class="logo-box">
-    <img style="height:200px;" src="./assets/electron.png" alt="Electron logo" />
-    <span />
-    <img style="height:200px;" alt="Vite logo" src="./assets/vite.svg" />
-    <span />
-    <img style="height:200px;" alt="Vue logo" src="./assets/vue.png" />
-  </div>
-  <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
+  <n-card title="歌曲" style="margin-bottom: 16px;">
+    <n-tabs type="line">
+      <n-tab-pane name="oasis" tab="Oasis">Wonderwall</n-tab-pane>
+      <n-tab-pane name="the beatles" tab="the Beatles">Hey Jude</n-tab-pane>
+      <n-tab-pane name="jay chou" tab="周杰伦">七里香</n-tab-pane>
+    </n-tabs>
+  </n-card>
+  <n-card>
+    <n-tabs default-value="signin" size="large">
+      <n-tab-pane name="signin" tab="登录">
+        <n-form>
+          <n-form-item-row label="用户名">
+            <n-input />
+          </n-form-item-row>
+          <n-form-item-row label="密码">
+            <n-input />
+          </n-form-item-row>
+        </n-form>
+        <n-button type="primary" block>登录</n-button>
+      </n-tab-pane>
+      <n-tab-pane name="signup" tab="注册">
+        <n-form>
+          <n-form-item-row label="用户名">
+            <n-input />
+          </n-form-item-row>
+          <n-form-item-row label="密码">
+            <n-input />
+          </n-form-item-row>
+          <n-form-item-row label="重复密码">
+            <n-input />
+          </n-form-item-row>
+        </n-form>
+        <n-button type="primary" block>注册</n-button>
+      </n-tab-pane>
+    </n-tabs>
+  </n-card>
 </template>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-
-.logo-box {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-}
-
-.logo-box span {
-  width: 74px;
-}
+body {
+    background: white;
+  }
 </style>
