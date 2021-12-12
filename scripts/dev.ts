@@ -15,7 +15,7 @@ const TAG = chalk.bgGreen(' dev.ts ')
  * @param {{ name: string; configFile: string; writeBundle: import('rollup').OutputPlugin['writeBundle'] }} param0
  * @returns {import('rollup').RollupWatcher}
  */
-export interface watcher {
+interface watcher {
   name: string,
   configFile: string,
   writeBundle: OutputPlugin['writeBundle']
@@ -64,7 +64,7 @@ async function watchMain() {
         ],
       }).then(() => {
         console.groupEnd()
-        console.clear()
+        // console.clear()
         const server = chalk.bgBlueBright(' server ')
         const url = chalk.blueBright(`http://127.0.0.1:${process.env.PORT}`)
         console.group(server, `running in ${url}`)

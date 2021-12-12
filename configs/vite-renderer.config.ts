@@ -9,6 +9,11 @@ export default defineConfig({
   root: join(__dirname, '../src/renderer'),
   plugins: [vue()],
   base: './',
+  resolve: {
+    alias: {
+      '@': './src'
+    }
+  },
   build: {
     target: 'modules',
     emptyOutDir: true,

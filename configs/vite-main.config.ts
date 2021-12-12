@@ -5,6 +5,11 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   mode: process.env.NODE_ENV,
   root: join(__dirname, '../src/main'),
+  resolve: {
+    alias: {
+      '@': './src'
+    }
+  },
   build: {
     outDir: '../../dist/main',
     lib: {

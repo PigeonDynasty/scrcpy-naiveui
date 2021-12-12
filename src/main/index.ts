@@ -1,6 +1,7 @@
 import os from 'os'
 import { join } from 'path'
-import { app, BrowserWindow, session } from 'electron'
+import { app, BrowserWindow, session, ipcMain } from 'electron'
+import scrcpy from './scrcpy'
 // https://stackoverflow.com/questions/42524606/how-to-get-windows-version-using-node-js
 const isWin7 = os.release().startsWith('6.1')
 if (isWin7) app.disableHardwareAcceleration()
@@ -15,6 +16,7 @@ let win: BrowserWindow | null = null
 async function bootstrap() {
   win = new BrowserWindow({
     webPreferences: {
+      nodeIntegration: true,
       preload: join(__dirname, '../preload/index.cjs'),
     },
   })
@@ -48,6 +50,10 @@ async function bootstrap() {
     win.maximize()
     win.webContents.openDevTools()
   }
+  win.webContents.on('did-finish-load', () => {
+    console.log('did-finish-load')
+    ipcMain.on('open', scrcpy)
+  })
 }
 
 app.whenReady().then(bootstrap)

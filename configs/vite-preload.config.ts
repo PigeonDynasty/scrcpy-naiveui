@@ -5,6 +5,11 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   mode: process.env.NODE_ENV,
   root: join(__dirname, '../src/preload'),
+  resolve: {
+    alias: {
+      '@': './src'
+    }
+  },
   build: {
     outDir: '../../dist/preload',
     lib: {
