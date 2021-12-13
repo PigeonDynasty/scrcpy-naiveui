@@ -1,6 +1,6 @@
 import os from 'os'
 import { join } from 'path'
-import { app, BrowserWindow, session, ipcMain, dialog, Dialog } from 'electron'
+import { app, BrowserWindow, session, ipcMain, dialog, nativeTheme, NativeTheme } from 'electron'
 import { adbDevicesListener, adbConnect, adbDisconnect } from './adb'
 import scrcpy from './scrcpy'
 // https://stackoverflow.com/questions/42524606/how-to-get-windows-version-using-node-js
@@ -76,6 +76,10 @@ async function bootstrap() {
           sender.send('file-selected', filePaths)
         }
       })
+    })
+    // 监听系统主题变化
+    nativeTheme.on('updated', ({ sender }: any) => {
+      win.webContents.send('theme-updated', sender.shouldUseDarkColors)
     })
   })
 }

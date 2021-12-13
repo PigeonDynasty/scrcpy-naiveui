@@ -1,7 +1,8 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import {
-  NCard,
+  NConfigProvider,
+  NGlobalStyle,
   NTabs,
   NTabPane,
   NInput,
@@ -17,10 +18,12 @@ import {
   NCheckboxGroup,
   NDivider
 } from 'naive-ui'
+import { darkTheme } from 'naive-ui'
 import { fileSelect } from './common/utils'
 export default defineComponent({
   components: {
-    NCard,
+    NConfigProvider,
+    NGlobalStyle,
     NTabs,
     NTabPane,
     NInput,
@@ -37,7 +40,13 @@ export default defineComponent({
     NDivider
   },
   setup() {
+    let isDark = ref(false)
+    window.ipcRenderer.on('theme-updated', (event: any, bol: boolean) => {
+      isDark.value = bol
+    })
     return {
+      isDark,
+      darkTheme,
       active: ref(false),
       value: ref(false),
       BitRate: ref(0),
@@ -77,7 +86,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <n-card title="Scrcpy" style="margin-bottom: 16px;">
+  <n-config-provider :theme="isDark ? darkTheme : null">
+    <n-global-style />
+
     <n-tabs default-value="Mirror configuration" justify-content="space-evenly" size="large">
       <n-tab-pane name="Mirror configuration" tab="镜像配置">
         <n-form>
@@ -154,11 +165,11 @@ export default defineComponent({
         </n-form>
       </n-tab-pane>
     </n-tabs>
-  </n-card>
+  </n-config-provider>
 </template>
 
 <style>
 body {
-  background: rgb(255, 255, 255);
+  padding: 0 20px 20px;
 }
 </style>
