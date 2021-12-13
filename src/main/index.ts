@@ -1,6 +1,6 @@
 import os from 'os'
 import { join } from 'path'
-import { app, BrowserWindow, session, ipcMain } from 'electron'
+import { app, BrowserWindow, session, ipcMain, dialog, Dialog } from 'electron'
 import { adbDevicesListener, adbConnect, adbDisconnect } from './adb'
 import scrcpy from './scrcpy'
 // https://stackoverflow.com/questions/42524606/how-to-get-windows-version-using-node-js
@@ -12,7 +12,7 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0)
 }
 
-let win: BrowserWindow | null = null
+let win: BrowserWindow
 
 async function bootstrap() {
   win = new BrowserWindow({
@@ -62,16 +62,27 @@ async function bootstrap() {
   })
   win.webContents.on('did-finish-load', () => {
     ipcMain.on('open', scrcpy)
-    adbDevicesListener(win?.webContents)
+    adbDevicesListener(win.webContents)
     ipcMain.on('connect', adbConnect)
     ipcMain.on('disconnect', adbDisconnect)
+    // 选择文件
+    ipcMain.on('file-select', ({ sender }, args) => {
+      dialog.showOpenDialog(
+        win, {
+        properties: args
+      }
+      ).then(({ canceled, filePaths }) => {
+        if (!canceled) {
+          sender.send('file-selected', filePaths)
+        }
+      })
+    })
   })
 }
 
 app.whenReady().then(bootstrap)
 
 app.on('window-all-closed', () => {
-  win = null
   if (process.platform !== 'darwin') {
     app.quit()
   }

@@ -3,7 +3,7 @@ import { BrowserWindow, IpcMainEvent } from 'electron'
 import { device } from '@/common/options.interface'
 const client = adb.createClient()
 // 设备列表变动监听
-function adbDevicesListener(webContents: BrowserWindow['webContents'] | undefined) {
+function adbDevicesListener(webContents: BrowserWindow['webContents']) {
   if (!webContents) return
   // 获取设备列表
   function listDevices() {
