@@ -1,13 +1,40 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import {
-  NCard, NTabs, NTabPane, NInput, NForm, NFormItemRow, NButton, NSpace, NSwitch,
-  NCheckbox, NSlider, NInputNumber, NSelect, NCheckboxGroup, NDivider
+  NCard,
+  NTabs,
+  NTabPane,
+  NInput,
+  NForm,
+  NFormItemRow,
+  NButton,
+  NSpace,
+  NSwitch,
+  NCheckbox,
+  NSlider,
+  NInputNumber,
+  NSelect,
+  NCheckboxGroup,
+  NDivider
 } from 'naive-ui'
+import { fileSelect } from './common/utils'
 export default defineComponent({
   components: {
-    NCard, NTabs, NTabPane, NInput, NForm, NFormItemRow, NButton, NSpace, NSwitch,
-    NCheckbox, NSlider, NInputNumber, NSelect, NCheckboxGroup, NDivider
+    NCard,
+    NTabs,
+    NTabPane,
+    NInput,
+    NForm,
+    NFormItemRow,
+    NButton,
+    NSpace,
+    NSwitch,
+    NCheckbox,
+    NSlider,
+    NInputNumber,
+    NSelect,
+    NCheckboxGroup,
+    NDivider
   },
   setup() {
     return {
@@ -35,7 +62,15 @@ export default defineComponent({
           value: 'angle3',
         }
       ],
-      settings: ref(null)
+      settings: ref(null),
+      recordPath: ref('')
+    }
+  },
+  methods: {
+    selectRecordPath() {
+      fileSelect().then(path => {
+        this.recordPath = path as string
+      })
     }
   }
 })
@@ -49,8 +84,13 @@ export default defineComponent({
           <n-form-item-row label="窗口标题">
             <n-input placeholder="请输入窗口标题" />
           </n-form-item-row>
-          <n-form-item-row label="Scrcpy">
-            <n-input placeholder="Scrcpy文件夹路径-例如:C:\scrcpy-win64" />
+          <n-form-item-row label="Scrcpy程序路径">
+            <n-input
+              v-model:value="recordPath"
+              readonly
+              placeholder="Scrcpy文件夹路径-例如:C:\scrcpy-win64\scrcpy.exe"
+              @click="selectRecordPath"
+            />
           </n-form-item-row>
           <n-form-item-row label="镜像录屏">
             <n-space>
