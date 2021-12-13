@@ -15,7 +15,7 @@ const TAG = chalk.bgGreen(' dev.ts ')
  * @param {{ name: string; configFile: string; writeBundle: import('rollup').OutputPlugin['writeBundle'] }} param0
  * @returns {import('rollup').RollupWatcher}
  */
-export interface watcher {
+interface watcher {
   name: string,
   configFile: string,
   writeBundle: OutputPlugin['writeBundle']

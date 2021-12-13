@@ -4,3 +4,10 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+declare interface Window {
+  ipcRenderer: any,
+  fs: any
+  removeLoading: any
+}
+
+declare module 'adbkit'
