@@ -56,8 +56,11 @@ async function bootstrap() {
     win.loadURL(url)
     win.maximize()
     win.webContents.openDevTools()
+
   }
   win.on('ready-to-show', () => {
+    // 赋值初始系统主题
+    win.webContents.send('theme-updated', nativeTheme.shouldUseDarkColors)
     win?.show()
   })
   win.webContents.on('did-finish-load', () => {
