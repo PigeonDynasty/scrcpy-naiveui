@@ -1,5 +1,5 @@
 {
-  "name": "vite-electron",
+  "name": "scrcpy-naiveui",
   "version": "0.0.1",
   "main": "dist/main/index.cjs",
   "author": "takenokos <takenokos@qq.com>",
@@ -13,7 +13,7 @@
     "node": ">=17.0.1"
   },
   "dependencies": {
-    "vue": "^3.2.22"
+    "adbkit": "^2.11.1"
   },
   "devDependencies": {
     "@types/node": "^16.11.12",
@@ -35,6 +35,7 @@
     "typescript": "^4.5.2",
     "vfonts": "^0.1.0",
     "vite": "^2.6.14",
+    "vue": "^3.2.22",
     "wait-on": "^6.0.0"
   },
   "keywords": [

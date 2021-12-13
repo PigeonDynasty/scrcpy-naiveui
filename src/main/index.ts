@@ -1,6 +1,7 @@
 import os from 'os'
 import { join } from 'path'
 import { app, BrowserWindow, session, ipcMain } from 'electron'
+import { adbDevicesListener, adbConnect, adbDisconnect } from './adb'
 import scrcpy from './scrcpy'
 // https://stackoverflow.com/questions/42524606/how-to-get-windows-version-using-node-js
 const isWin7 = os.release().startsWith('6.1')
@@ -15,6 +16,12 @@ let win: BrowserWindow | null = null
 
 async function bootstrap() {
   win = new BrowserWindow({
+    height: 600,
+    width: 356,
+    center: true,
+    maximizable: false,
+    fullscreenable: false,
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       preload: join(__dirname, '../preload/index.cjs'),
@@ -50,9 +57,14 @@ async function bootstrap() {
     win.maximize()
     win.webContents.openDevTools()
   }
+  win.on('ready-to-show', () => {
+    win?.show()
+  })
   win.webContents.on('did-finish-load', () => {
-    console.log('did-finish-load')
     ipcMain.on('open', scrcpy)
+    adbDevicesListener(win?.webContents)
+    ipcMain.on('connect', adbConnect)
+    ipcMain.on('disconnect', adbDisconnect)
   })
 }
 
@@ -72,7 +84,12 @@ app.on('second-instance', () => {
     win.focus()
   }
 })
-
+app.on('activate', (event: Event, hasVisibleWindows: boolean) => {
+  // macos dock点击判断 没有窗口则新建
+  if (!hasVisibleWindows) {
+    bootstrap()
+  }
+})
 // @TODO
 // auto update
 /* if (app.isPackaged) {

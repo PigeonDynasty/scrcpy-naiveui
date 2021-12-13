@@ -1,7 +1,8 @@
-interface device {
-  id: string
+export interface device {
+  id: string,
+  ip: string
 }
-interface config {
+export interface config {
   title: string, // 窗口标题
   source: string, // scrcpy路径
   record: boolean, // 镜像录屏

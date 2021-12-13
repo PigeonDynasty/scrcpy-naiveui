@@ -1,12 +1,11 @@
 {
   "appId": "com.takenokos.${productName}",
-  "productName": "ViteElectron",
+  "productName": "scrcpy-naiveui",
   "copyright": "Copyright © 2021 ${author}",
   "directories": {
     "output": "release/${version}/${os}"
   },
   "files": [
-    "!node_modules",
     "dist",
     "package.json"
   ],

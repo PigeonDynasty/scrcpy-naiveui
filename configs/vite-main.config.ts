@@ -7,7 +7,7 @@ export default defineConfig({
   root: join(__dirname, '../src/main'),
   resolve: {
     alias: {
-      '@': './src'
+      '@': '../src'
     }
   },
   build: {
@@ -23,6 +23,7 @@ export default defineConfig({
       external: [
         ...builtinModules,
         'electron',
+        'adbkit'
       ],
       output: {
         entryFileNames: '[name].cjs',

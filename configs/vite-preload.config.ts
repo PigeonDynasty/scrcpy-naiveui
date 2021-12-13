@@ -7,7 +7,7 @@ export default defineConfig({
   root: join(__dirname, '../src/preload'),
   resolve: {
     alias: {
-      '@': './src'
+      '@': '../src'
     }
   },
   build: {
@@ -22,7 +22,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
         ...builtinModules,
-        'electron',
+        'electron'
       ],
       output: {
         entryFileNames: '[name].cjs',
