@@ -3,7 +3,7 @@ import { h, ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import { NTag, NInput, NButton, NDataTable, NEmpty, useMessage, NSpace } from 'naive-ui'
 import type { TableColumns } from 'naive-ui/lib/data-table/src/interface'
 import { device } from '@/types/options'
-// const message = useMessage() // 注册message方法
+const message = useMessage() // 注册message方法
 const loading = ref(true)
 // 数据表格渲染格式
 const columns: TableColumns = [
@@ -72,7 +72,7 @@ const columns: TableColumns = [
               } else {
                 // 向主线程发起无线连接请求
                 if (!row.ip || !isIP(row.ip as string)) {
-                  // message.warning('请检查ip地址')
+                  message.warning('请检查ip地址')
                   return
                 }
                 // window.ipcRenderer.send('connect', row)
@@ -114,7 +114,6 @@ onMounted(() => {
   window.ipcRenderer.on('devices', (event: any, devices: device[]) => {
     data.length = 0 // 清空数组
     data.push(...devices)
-    console.log(data)
     loading.value = false
   })
 })

@@ -90,14 +90,8 @@ async function bootstrap() {
       }
     })
   })
-  // 监听系统主题变化
-  nativeTheme.on('updated', ({ sender }: any) => {
-    win.webContents.send('theme-updated', sender.shouldUseDarkColors)
-  })
   // end 通信部分
   win.on('ready-to-show', () => {
-    // 赋值初始系统主题
-    win.webContents.send('theme-updated', nativeTheme.shouldUseDarkColors)
   })
   // 页面加载完成
   win.webContents.on('did-finish-load', () => {
