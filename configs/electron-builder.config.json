@@ -1,5 +1,5 @@
 {
-  "appId": "com.takenokos.${productName}",
+  "appId": "com.takenokos.scrcpy-naiveui",
   "productName": "scrcpy-naiveui",
   "copyright": "Copyright © 2021 ${author}",
   "directories": {
