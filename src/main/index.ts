@@ -1,7 +1,8 @@
 import os from 'os'
+import fs from 'fs'
 import { join } from 'path'
 import { app, BrowserWindow, session, ipcMain, dialog, nativeTheme, NativeTheme } from 'electron'
-import { adbDevicesListener, adbConnect, adbDisconnect } from './adb'
+import { listAdbDevices, adbDevicesListener, adbConnect, adbDisconnect } from './adb'
 import scrcpy from './scrcpy'
 // https://stackoverflow.com/questions/42524606/how-to-get-windows-version-using-node-js
 const isWin7 = os.release().startsWith('6.1')
@@ -46,11 +47,22 @@ async function bootstrap() {
           devpath = '/.config/google-chrome/Default/Extensions'
           break
       }
-      devpath += '/ljjemllljcmogpfapbkkighbhhppjdbg/6.0.0.20_0';
-      console.log(join(os.homedir(), devpath))
-      await session.defaultSession.loadExtension(join(os.homedir(), devpath));
+      devpath += '/ljjemllljcmogpfapbkkighbhhppjdbg/' // 还需要取版本号文件夹 6.0.0.20_1
+      const devToolPath = join(os.homedir(), devpath)
+      const dirlist = fs.readdirSync(devToolPath) // 定位插件位置
+      let versionPath = ''
+      // for 方便跳出循环 查找版本号文件夹
+      for (let i = 0; i < dirlist.length; i++) {
+        const new_path = join(devToolPath, dirlist[i])
+        const stat = fs.statSync(new_path) //要检查是否为文件夹，需获取stat对象
+        if (stat && stat.isDirectory()) {
+          versionPath = new_path
+          break
+        }
+      }
+      await session.defaultSession.loadExtension(versionPath)
     } catch (e) {
-      console.error('Vue Devtools failed to install:', e);
+      console.error('Vue Devtools failed to install:', e)
     }
     const url = `http://127.0.0.1:${process.env['PORT']}`
     win.loadURL(url)
@@ -58,32 +70,38 @@ async function bootstrap() {
     win.webContents.openDevTools()
 
   }
+  // 主线程与渲染线程通信
+  adbDevicesListener(win.webContents) // 监听设备列表变化
+  ipcMain.on('open', scrcpy)
+  ipcMain.on('connect', adbConnect)
+  ipcMain.on('disconnect', adbDisconnect)
+  ipcMain.on('get-adb-devices', () => {
+    listAdbDevices(win.webContents)
+  })
+  // 选择文件
+  ipcMain.on('file-select', ({ sender }, args) => {
+    dialog.showOpenDialog(
+      win, {
+      properties: args
+    }
+    ).then(({ canceled, filePaths }) => {
+      if (!canceled) {
+        sender.send('file-selected', filePaths)
+      }
+    })
+  })
+  // 监听系统主题变化
+  nativeTheme.on('updated', ({ sender }: any) => {
+    win.webContents.send('theme-updated', sender.shouldUseDarkColors)
+  })
+  // end 通信部分
   win.on('ready-to-show', () => {
     // 赋值初始系统主题
     win.webContents.send('theme-updated', nativeTheme.shouldUseDarkColors)
-    win?.show()
   })
+  // 页面加载完成
   win.webContents.on('did-finish-load', () => {
-    ipcMain.on('open', scrcpy)
-    adbDevicesListener(win.webContents)
-    ipcMain.on('connect', adbConnect)
-    ipcMain.on('disconnect', adbDisconnect)
-    // 选择文件
-    ipcMain.on('file-select', ({ sender }, args) => {
-      dialog.showOpenDialog(
-        win, {
-        properties: args
-      }
-      ).then(({ canceled, filePaths }) => {
-        if (!canceled) {
-          sender.send('file-selected', filePaths)
-        }
-      })
-    })
-    // 监听系统主题变化
-    nativeTheme.on('updated', ({ sender }: any) => {
-      win.webContents.send('theme-updated', sender.shouldUseDarkColors)
-    })
+    win?.show()
   })
 }
 

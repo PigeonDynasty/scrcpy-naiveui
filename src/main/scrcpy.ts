@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { IpcMainEvent } from 'electron'
 import { spawn } from 'child_process'
-import options from '@/common/options.interface'
+import options from '@/types/options'
 const argTemplete: object = {
   title: '--window-title ${config.title}',
   record: '--record ${config.recordpath}',
@@ -33,7 +33,7 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
     cmd = config.source
   }
   // 默认参数
-  args.push('--shortcut-mod=lctrl,rctrl -s')
+  args.push('--shortcut-mod=lctrl,rctrl')
   // 添加启动参数
   type arg = keyof typeof argTemplete
   function addArg(key: string) {
@@ -52,7 +52,7 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
   })
   // 处理模板
   devices.forEach(({ id }) => {
-    const command = spawn(cmd, [...args, `${id}`])
+    const command = spawn(cmd, [...args, '-s', `${id}`])
     let opened = false
     let exited = false
     command.stdout.on('data', (data) => {

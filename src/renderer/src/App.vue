@@ -16,10 +16,14 @@ import {
   NInputNumber,
   NSelect,
   NCheckboxGroup,
-  NDivider
+  NDivider,
+  NGrid,
+  NGridItem,
+  NFormItem,
 } from 'naive-ui'
 import { darkTheme } from 'naive-ui'
 import { fileSelect } from './common/utils'
+import Management from './components/Management.vue'
 export default defineComponent({
   components: {
     NConfigProvider,
@@ -37,7 +41,11 @@ export default defineComponent({
     NInputNumber,
     NSelect,
     NCheckboxGroup,
-    NDivider
+    NDivider,
+    Management,
+    NGrid,
+    NGridItem,
+    NFormItem
   },
   setup() {
     let isDark = ref(false)
@@ -112,17 +120,21 @@ export default defineComponent({
           <n-form-item-row label="录屏文件路径">
             <n-input placeholder="请输入录屏文件路径" />
           </n-form-item-row>
-          <n-form-item-row label="镜像传输比特率">
+          <n-form-item label="镜像传输比特率">
             <n-space vertical>
               <n-slider v-model:value="BitRate" :step="1" :max="1024" />
-              <n-input-number size="small" v-model:value="BitRate" :min="0" />
+              <!-- <n-input-number size="small" v-model:value="BitRate" :min="0" /> -->
             </n-space>
-          </n-form-item-row>
+          </n-form-item>
           <n-form-item-row label="等比最大分辨率">
-            <n-space vertical>
-              <n-slider v-model:value="resolution" :step="1" :max="1024" />
-              <n-input-number size="small" v-model:value="resolution" :min="0" />
-            </n-space>
+            <n-grid :cols="2">
+              <n-grid-item>
+                <n-slider v-model:value="resolution" :step="1" :max="1024" />
+              </n-grid-item>
+              <n-grid-item>
+                <n-input-number size="small" v-model:value="resolution" :min="0" />
+              </n-grid-item>
+            </n-grid>
           </n-form-item-row>
           <n-form-item-row label="最大帧率">
             <n-space vertical>
@@ -147,7 +159,7 @@ export default defineComponent({
             </n-checkbox-group>
           </n-form-item-row>
           <n-divider />
-          <n-space>
+          <n-space style="text-align: center;">
             <n-button type="info">保存当前配置</n-button>
             <n-button type="primary">恢复默认配置</n-button>
           </n-space>
@@ -163,6 +175,9 @@ export default defineComponent({
           <n-divider></n-divider>
           <n-form-item-row label="暂无设备连接"></n-form-item-row>
         </n-form>
+      </n-tab-pane>
+      <n-tab-pane name="tset">
+        <Management />
       </n-tab-pane>
     </n-tabs>
   </n-config-provider>

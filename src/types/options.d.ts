@@ -1,8 +1,15 @@
-export interface device {
+import type { InternalRowData } from 'naive-ui/lib/data-table/src/interface'
+interface device extends InternalRowData {
   id: string,
-  ip: string
+  type: string,
+  ip?: string,
+  name?: string,
+  method?: string
 }
-export interface config {
+interface other {
+  alwaysOnTop: string
+}
+interface config {
   title: string, // 窗口标题
   source: string, // scrcpy路径
   record: boolean, // 镜像录屏
@@ -12,7 +19,7 @@ export interface config {
   maxSize: number, // 等比最大分辨率
   maxFps: number, // 最大帧率
   rotation: number,// 旋转角度
-  other: string[] // 其他配置
+  other: (keyof other)[] // 其他配置
   // 其他配置的参数
   // alwaysOnTop,// 窗口置顶
   // noControl,// 电脑控制 不允许控制
@@ -26,4 +33,8 @@ export interface config {
 export default interface options {
   config: config,
   devices: device[]
+}
+export {
+  device,
+  config
 }
