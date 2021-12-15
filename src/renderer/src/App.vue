@@ -18,8 +18,7 @@ import {
   NCheckboxGroup,
   NDivider,
   NGrid,
-  NGridItem,
-  NFormItem,
+  NGridItem
 } from 'naive-ui'
 import { darkTheme } from 'naive-ui'
 import { fileSelect } from './common/utils'
@@ -42,10 +41,9 @@ export default defineComponent({
     NSelect,
     NCheckboxGroup,
     NDivider,
-    Management,
     NGrid,
     NGridItem,
-    NFormItem
+    Management
   },
   setup() {
     let isDark = ref(false)
@@ -96,14 +94,13 @@ export default defineComponent({
 <template>
   <n-config-provider :theme="isDark ? darkTheme : null">
     <n-global-style />
-
     <n-tabs default-value="Mirror configuration" justify-content="space-evenly" size="large">
       <n-tab-pane name="Mirror configuration" tab="镜像配置">
-        <n-form>
-          <n-form-item-row label="窗口标题">
+        <n-form label-placement="left" label-align="left">
+          <n-form-item-row label="窗口标题" label-width="110">
             <n-input placeholder="请输入窗口标题" />
           </n-form-item-row>
-          <n-form-item-row label="Scrcpy程序路径">
+          <n-form-item-row label="Scrcpy程序路径" label-width="110">
             <n-input
               v-model:value="recordPath"
               readonly
@@ -111,23 +108,27 @@ export default defineComponent({
               @click="selectRecordPath"
             />
           </n-form-item-row>
-          <n-form-item-row label="镜像录屏">
+          <n-form-item-row label="镜像录屏" label-width="110">
             <n-space>
               <n-switch v-model:value="active" />
               <n-checkbox v-model:checked="value">录屏时打开镜像</n-checkbox>
             </n-space>
           </n-form-item-row>
-          <n-form-item-row label="录屏文件路径">
+          <n-form-item-row label="录屏文件路径" label-width="110">
             <n-input placeholder="请输入录屏文件路径" />
           </n-form-item-row>
-          <n-form-item label="镜像传输比特率">
-            <n-space vertical>
-              <n-slider v-model:value="BitRate" :step="1" :max="1024" />
-              <!-- <n-input-number size="small" v-model:value="BitRate" :min="0" /> -->
-            </n-space>
-          </n-form-item>
-          <n-form-item-row label="等比最大分辨率">
-            <n-grid :cols="2">
+          <n-form-item-row label="镜像传输比特率" label-width="110">
+            <n-grid :cols="2" x-gap="100px">
+              <n-grid-item>
+                <n-slider v-model:value="BitRate" :step="1" :max="1024" />
+              </n-grid-item>
+              <n-grid-item>
+                <n-input-number size="small" v-model:value="BitRate" :min="0" />
+              </n-grid-item>
+            </n-grid>
+          </n-form-item-row>
+          <n-form-item-row label="等比最大分辨率" label-width="110">
+            <n-grid :cols="2" x-gap="100px">
               <n-grid-item>
                 <n-slider v-model:value="resolution" :step="1" :max="1024" />
               </n-grid-item>
@@ -136,16 +137,20 @@ export default defineComponent({
               </n-grid-item>
             </n-grid>
           </n-form-item-row>
-          <n-form-item-row label="最大帧率">
-            <n-space vertical>
-              <n-slider v-model:value="Framerate" :step="1" :max="144" />
-              <n-input-number size="small" v-model:value="Framerate" :min="0" />
-            </n-space>
+          <n-form-item-row label="最大帧率" label-width="110">
+            <n-grid :cols="2" x-gap="100px">
+              <n-grid-item>
+                <n-slider v-model:value="Framerate" :step="1" :max="144" />
+              </n-grid-item>
+              <n-grid-item>
+                <n-input-number size="small" v-model:value="Framerate" :min="0" />
+              </n-grid-item>
+            </n-grid>
           </n-form-item-row>
-          <n-form-item-row label="旋转角度">
+          <n-form-item-row label="旋转角度" label-width="110">
             <n-select v-model:value="angle" :options="options" />
           </n-form-item-row>
-          <n-form-item-row label="其他设置">
+          <n-form-item-row label="其他设置" label-width="110">
             <n-checkbox-group v-model:value="settings">
               <n-space item-style="display: flex;">
                 <n-checkbox value="zhiding" label="窗口置顶" />
@@ -166,18 +171,7 @@ export default defineComponent({
         </n-form>
       </n-tab-pane>
       <n-tab-pane name="Image management" tab="镜像管理">
-        <n-form>
-          <n-divider>设备局域网IP地址</n-divider>
-          <n-form-item-row>
-            <n-input placeholder="请输入IP地址" />
-          </n-form-item-row>
-          <n-button type="primary">开启无线连接</n-button>
-          <n-divider></n-divider>
-          <n-form-item-row label="暂无设备连接"></n-form-item-row>
-        </n-form>
-      </n-tab-pane>
-      <n-tab-pane name="tset">
-        <Management />
+        <management />
       </n-tab-pane>
     </n-tabs>
   </n-config-provider>
