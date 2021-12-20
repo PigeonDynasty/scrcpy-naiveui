@@ -25,6 +25,7 @@
     "dotenv": "^10.0.0",
     "electron": "^16.0.4",
     "electron-builder": "^22.14.5",
+    "electron-log": "^4.4.3",
     "eslint": "^7.12.1",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.3",

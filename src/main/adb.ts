@@ -46,7 +46,6 @@ function adbDevicesListener(webContents: BrowserWindow['webContents']) {
 }
 // 连接设备
 function adbConnect({ sender }: IpcMainEvent, device: device) {
-  console.log(device)
   const { id, ip } = device
   const ipPort: number = Number(ip?.split(':')[1])
   // 连接的方法 没设置端口号默认是5555
@@ -61,7 +60,6 @@ function adbConnect({ sender }: IpcMainEvent, device: device) {
   if (id) {
     // 有id 先根据id获取端口
     client.getDevice(id).tcpip(ipPort || 5555).then((port: number) => {
-      console.log(port)
       // 获取成功 根据ip port 进行连接
       connect(port)
     }).catch(() => {

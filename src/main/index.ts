@@ -4,6 +4,8 @@ import { join } from 'path'
 import { app, BrowserWindow, session, ipcMain, dialog } from 'electron'
 import { listAdbDevices, adbDevicesListener, adbConnect, adbDisconnect } from './adb'
 import scrcpy from './scrcpy'
+import { functions } from 'electron-log'
+Object.assign(console, functions)
 // https://stackoverflow.com/questions/42524606/how-to-get-windows-version-using-node-js
 const isWin7 = os.release().startsWith('6.1')
 if (isWin7) app.disableHardwareAcceleration()

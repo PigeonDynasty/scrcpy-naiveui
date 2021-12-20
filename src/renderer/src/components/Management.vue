@@ -124,7 +124,7 @@ const columns: TableColumns = [
                     size: 'small',
                     type: 'info',
                     onClick: () => {
-                      window.ipcRenderer.send('scrcpy-open', { config: mconfig.value, id: row.id })
+                      window.ipcRenderer.send('scrcpy-open', { config: JSON.parse(JSON.stringify(mconfig.value)), id: row.id })
                     }
                   },
                   { default: () => '打开镜像' }),

@@ -1,8 +1,12 @@
 import fs from 'fs'
 import { IpcMainEvent } from 'electron'
-import { spawn } from 'child_process'
+import { spawn, execSync } from 'child_process'
 import options from '@/types/options'
-import './fixShell'
+import getShellPath from './shellPath'
+let path: string = ''
+getShellPath().then((PATH: string) => {
+  path = PATH || execSync(`echo $PATH`).toString().slice(0, -1)
+})
 const argTemplete: object = {
   title: {
     key: '--window-title',
@@ -40,9 +44,8 @@ const argTemplete: object = {
   renderAll: '--render-expired-frames',// 渲染所有帧 会增加延迟
   screenOff: '--turn-screen-off',// 打开镜像时关闭屏幕
 }
-const openedIds: string[] = []
+
 export default ({ sender }: IpcMainEvent, opt: options) => {
-  console.log('ipc open')
   const args: string[] = []
   const { config, id } = opt
   let cmd = 'scrcpy'
@@ -60,10 +63,10 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
   function addArg(key: string) {
     const arg = argTemplete[key as arg]
     if (arg) {
-      if (arg['key']) {
+      if (arg['key'] && config[arg['configKey']]) {
         args.push(arg['key'])
         args.push(String(config[arg['configKey']]) + arg['suffix'] || '')
-      } else {
+      } else if (!arg['key']) {
         args.push(arg)
       }
     }
@@ -74,11 +77,15 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
         addArg(str)
       })
     } else {
-      addArg(key)
+      config[key as keyof typeof config] && addArg(key)
     }
   })
-  // devices.forEach(({ id }) => {
-  const command = spawn(cmd, [...args, '-s', `${id}`])
+  // end 参数
+  const command = spawn(cmd, [...args, '-s', `${id}`], {
+    env: {
+      PATH: path
+    }
+  })
   let opened = false
   let exited = false
   command.stdout.on('data', (data) => {
@@ -105,5 +112,4 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
       exited = true
     }
   })
-  // })
 }

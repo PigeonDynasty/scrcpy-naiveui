@@ -1,4 +1,4 @@
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import { createSotore } from '../plugins/store'
 import { device, config } from '@/types/options'
 const devices: device[] = []
