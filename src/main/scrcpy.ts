@@ -40,6 +40,7 @@ const argTemplete: object = {
   renderAll: '--render-expired-frames',// 渲染所有帧 会增加延迟
   screenOff: '--turn-screen-off',// 打开镜像时关闭屏幕
 }
+const openedIds: string[] = []
 export default ({ sender }: IpcMainEvent, opt: options) => {
   console.log('ipc open')
   const args: string[] = []
@@ -47,7 +48,7 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
   let cmd = 'scrcpy'
   if (config.source) { // 如果配置了scrcpy路径
     if (!fs.existsSync(config.source)) {
-      sender.send('scrcpy-error', { type: 'unknownScrcpyPathException' })
+      !sender.isDestroyed() && sender.send('scrcpy-error', { type: 'unknownScrcpyPathException' })
       return
     }
     cmd = config.source
@@ -82,7 +83,7 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
   let exited = false
   command.stdout.on('data', (data) => {
     if (!opened) {
-      sender.send('scrcpy-opened', id)
+      !sender.isDestroyed() && sender.send('scrcpy-opened', id)
       opened = true
     }
     console.log(`stdout: ${data} ${id}`)
@@ -99,7 +100,7 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
   command.on('exit', (code) => {
     console.log(`child process exited with code ${code} ${id}`)
     if (!exited) {
-      if (!sender.isDestroyed()) sender.send('scrcpy-closeed', { success: code === 0, id })
+      !sender.isDestroyed() && sender.send('scrcpy-closeed', id)
       command.kill()
       exited = true
     }

@@ -1,6 +1,5 @@
 // 处理shell问题
-// import process from 'node:process'
-import execa from 'execa'
+import { spawn } from 'child_process'
 import stripAnsi from 'strip-ansi'
 // 获取默认shell
 function detectDefaultShell() {
@@ -25,7 +24,7 @@ function parseEnv(env: any) {
   return returnValue
 }
 // shell 环境
-async function shellEnv() {
+function shellEnv() {
   if (process.platform === 'win32') {
     return process.env
   }
@@ -40,7 +39,7 @@ async function shellEnv() {
       // Disables Oh My Zsh auto-update thing that can block the process.
       DISABLE_AUTO_UPDATE: 'true',
     }
-    const { stdout } = await execa(defaultShell, args, { env })
+    const { stdout } = spawn(defaultShell, args, { env })
     return parseEnv(stdout)
   } catch (error) {
     return process.env

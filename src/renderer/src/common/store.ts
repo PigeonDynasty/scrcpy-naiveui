@@ -26,6 +26,11 @@ const dispatch = {
   // 更新所有设备数据
   updateDevices(devices: device[]) {
     state.devicesLoading = true
+    // 首先把没有获取到的设备全都修改为offline
+    state.devices.forEach(device => {
+      const obj = devices.find(item => item.id === device.id)
+      !obj && (device.type = 'offline')
+    })
     devices.forEach(device => {
       dispatch.updateDevice(device)
     })

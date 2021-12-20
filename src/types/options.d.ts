@@ -3,6 +3,7 @@ declare interface device extends InternalRowData {
   id: string,
   type: string,
   ip?: string,
+  _ip?: string, // 暂存输入的ip地址
   name?: string,
   method?: string
 }

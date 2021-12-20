@@ -23,7 +23,7 @@ function listAdbDevices({ sender }: IpcMainEvent) {
       devices.map((device: device) => getAdbDeviceInfo(device))
     )
   }).then((devices: device[]) => {
-    sender && sender.send('device-listed', devices)
+    sender && !sender.isDestroyed() && sender.send('device-listed', devices)
   })
 }
 // 设备列表变动监听
@@ -34,7 +34,7 @@ function adbDevicesListener(webContents: BrowserWindow['webContents']) {
     tracker.on('change', async (device: device) => {
       console.log('Device %s was changed to %s', device.id, device.type)
       const d: device = await getAdbDeviceInfo(device)
-      webContents.send('device-updated', d)
+      !webContents.isDestroyed() && webContents.send('device-updated', d)
     })
     // 结束
     tracker.on('end', () => {
@@ -53,9 +53,9 @@ function adbConnect({ sender }: IpcMainEvent, device: device) {
   function connect(port = 5555) {
     if (!ip) return
     client.connect(ip, port).then((err: any) => {
-      sender.send('device-connected', !err)
+      !sender.isDestroyed() && sender.send('device-connected', !err)
     }).catch(() => {
-      sender.send('device-connected', false)
+      !sender.isDestroyed() && sender.send('device-connected', false)
     })
   }
   if (id) {
@@ -75,9 +75,9 @@ function adbConnect({ sender }: IpcMainEvent, device: device) {
 // 断开连接
 function adbDisconnect({ sender }: IpcMainEvent, ip: string) {
   client.disconnect(ip).then((id: string) => {
-    sender.send('device-disconnected', true)
+    !sender.isDestroyed() && sender.send('device-disconnected', true)
   }).catch(() => {
-    sender.send('device-disconnected', false)
+    !sender.isDestroyed() && sender.send('device-disconnected', false)
   })
 }
 export {
