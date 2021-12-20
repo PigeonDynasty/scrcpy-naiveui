@@ -1,15 +1,22 @@
 import type { InternalRowData } from 'naive-ui/lib/data-table/src/interface'
-interface device extends InternalRowData {
+declare interface device extends InternalRowData {
   id: string,
   type: string,
   ip?: string,
   name?: string,
   method?: string
 }
-interface other {
-  alwaysOnTop: string
+declare interface other {
+  alwaysOnTop: boolean,// 窗口置顶
+  noControl: boolean,// 电脑控制 不允许控制
+  borderless: boolean,//有无边框 无边框
+  fullscreen: boolean,// 全屏显示
+  stayAwake: boolean,// 关闭锁屏
+  showTouches: boolean,// 显示点按位置
+  renderAll: boolean,// 渲染所有帧 会增加延迟
+  screenOff: boolean// 打开镜像时关闭屏幕
 }
-interface config {
+declare interface config {
   title: string, // 窗口标题
   source: string, // scrcpy路径
   record: boolean, // 镜像录屏
@@ -20,19 +27,10 @@ interface config {
   maxFps: number, // 最大帧率
   rotation: number,// 旋转角度
   other: (keyof other)[] // 其他配置
-  // 其他配置的参数
-  // alwaysOnTop,// 窗口置顶
-  // noControl,// 电脑控制 不允许控制
-  // borderless,//有无边框
-  // fullscreen,// 全屏显示
-  // stayAwake,// 关闭锁屏
-  // showTouches,// 显示点按位置
-  // renderAll,// 渲染所有帧 会增加延迟
-  // screenOff,// 打开镜像时关闭屏幕
 }
 export default interface options {
   config: config,
-  devices: device[]
+  id: device['id']
 }
 export {
   device,

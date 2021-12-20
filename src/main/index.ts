@@ -1,7 +1,7 @@
 import os from 'os'
 import fs from 'fs'
 import { join } from 'path'
-import { app, BrowserWindow, session, ipcMain, dialog, nativeTheme, NativeTheme } from 'electron'
+import { app, BrowserWindow, session, ipcMain, dialog } from 'electron'
 import { listAdbDevices, adbDevicesListener, adbConnect, adbDisconnect } from './adb'
 import scrcpy from './scrcpy'
 // https://stackoverflow.com/questions/42524606/how-to-get-windows-version-using-node-js
@@ -22,13 +22,13 @@ async function bootstrap() {
     center: true,
     maximizable: false,
     fullscreenable: false,
-    show: false,
+    // show: false,
     webPreferences: {
       nodeIntegration: true,
       preload: join(__dirname, '../preload/index.cjs'),
     },
   })
-
+  win.removeMenu() // 移除顶部菜单
   if (app.isPackaged) {
     win.loadFile(join(__dirname, '../renderer/index.html'))
   } else {
@@ -70,32 +70,39 @@ async function bootstrap() {
     win.webContents.openDevTools()
 
   }
-  // 主线程与渲染线程通信
-  adbDevicesListener(win.webContents) // 监听设备列表变化
-  ipcMain.on('open', scrcpy)
-  ipcMain.on('connect', adbConnect)
-  ipcMain.on('disconnect', adbDisconnect)
-  ipcMain.on('get-adb-devices', () => {
-    listAdbDevices(win.webContents)
-  })
-  // 选择文件
-  ipcMain.on('file-select', ({ sender }, args) => {
-    dialog.showOpenDialog(
-      win, {
-      properties: args
-    }
-    ).then(({ canceled, filePaths }) => {
-      if (!canceled) {
-        sender.send('file-selected', filePaths)
-      }
-    })
-  })
-  // end 通信部分
+  // 窗口准备好打开
   win.on('ready-to-show', () => {
+    // win?.show()
   })
   // 页面加载完成
   win.webContents.on('did-finish-load', () => {
-    win?.show()
+    // 主线程与渲染线程通信
+    adbDevicesListener(win.webContents) // 监听设备列表变化
+    ipcMain.on('scrcpy-open', scrcpy)
+    ipcMain.on('device-connect', adbConnect)
+    ipcMain.on('device-disconnect', adbDisconnect)
+    ipcMain.on('device-list', listAdbDevices)
+    // 选择文件
+    ipcMain.on('file-select', ({ sender }, args) => {
+      dialog.showOpenDialog(
+        win, {
+        properties: args
+      }
+      ).then(({ canceled, filePaths }) => {
+        if (!canceled) {
+          sender.send('file-selected', filePaths)
+        }
+      })
+    })
+    // end 通信部分
+  })
+  // 页面关闭 移除通信监听
+  win.on('close', () => {
+    ipcMain.removeAllListeners('scrcpy-open')
+    ipcMain.removeAllListeners('device-connect')
+    ipcMain.removeAllListeners('device-disconnect')
+    ipcMain.removeAllListeners('device-list')
+    ipcMain.removeAllListeners('file-select')
   })
 }
 

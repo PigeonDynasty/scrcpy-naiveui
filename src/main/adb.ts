@@ -3,7 +3,7 @@ import { BrowserWindow, IpcMainEvent } from 'electron'
 import { device } from '@/types/options'
 const client = adb.createClient()
 // 处理设备数据
-async function fixDevice(device: device) {
+async function getAdbDeviceInfo(device: device) {
   try {
     const d = client.getDevice(device.id)
     // 获取设备prop
@@ -11,32 +11,30 @@ async function fixDevice(device: device) {
     device.name = properties['ro.product.name']
     // 获取设备ip
     device.ip = await d.getDHCPIpAddress()
-  } catch { }
-  return device
+    return device
+  } catch {
+    return device
+  }
 }
 // 获取设备列表
-function listAdbDevices(webContents: BrowserWindow['webContents'] | IpcMainEvent['sender']) {
+function listAdbDevices({ sender }: IpcMainEvent) {
   client.listDevices().then((devices: device[]) => {
     return Promise.all(
-      devices.map((device: device) => fixDevice(device))
+      devices.map((device: device) => getAdbDeviceInfo(device))
     )
   }).then((devices: device[]) => {
-    webContents && webContents.send('devices', devices)
+    sender && sender.send('device-listed', devices)
   })
 }
 // 设备列表变动监听
 function adbDevicesListener(webContents: BrowserWindow['webContents']) {
   if (!webContents) return
   client.trackDevices().then((tracker: any) => {
-    // 添加
-    tracker.on('add', (device: device) => {
-      console.log('Device %s was plugged in', device.id)
-      listAdbDevices(webContents)
-    })
-    // 移除
-    tracker.on('remove', (device: device) => {
-      console.log('Device %s was unplugged', device.id)
-      listAdbDevices(webContents)
+    // 全部修改操作
+    tracker.on('change', async (device: device) => {
+      console.log('Device %s was changed to %s', device.id, device.type)
+      const d: device = await getAdbDeviceInfo(device)
+      webContents.send('device-updated', d)
     })
     // 结束
     tracker.on('end', () => {
@@ -48,37 +46,42 @@ function adbDevicesListener(webContents: BrowserWindow['webContents']) {
 }
 // 连接设备
 function adbConnect({ sender }: IpcMainEvent, device: device) {
+  console.log(device)
   const { id, ip } = device
+  const ipPort: number = Number(ip?.split(':')[1])
   // 连接的方法 没设置端口号默认是5555
-  function connect(ip: string, port: number = 5555) {
+  function connect(port = 5555) {
+    if (!ip) return
     client.connect(ip, port).then((err: any) => {
-      sender.send('connected', !err)
+      sender.send('device-connected', !err)
     }).catch(() => {
-      sender.send('connected', false)
+      sender.send('device-connected', false)
     })
   }
   if (id) {
     // 有id 先根据id获取端口
-    client.getDevice(id).tcpip().then((port: number) => {
+    client.getDevice(id).tcpip(ipPort || 5555).then((port: number) => {
+      console.log(port)
       // 获取成功 根据ip port 进行连接
-      ip && connect(ip, port)
+      connect(port)
     }).catch(() => {
       // 获取失败 尝试ip直接连接
-      ip && connect(ip)
+      connect()
     })
   } else {
-    ip && connect(ip)
+    connect()
   }
 }
 // 断开连接
 function adbDisconnect({ sender }: IpcMainEvent, ip: string) {
   client.disconnect(ip).then((id: string) => {
-    sender.send('disconnected', true)
+    sender.send('device-disconnected', true)
   }).catch(() => {
-    sender.send('disconnected', false)
+    sender.send('device-disconnected', false)
   })
 }
 export {
+  getAdbDeviceInfo,
   listAdbDevices,
   adbDevicesListener,
   adbConnect,

@@ -1,19 +1,44 @@
 <script setup lang="ts">
-import { h, ref, reactive, onMounted, onBeforeUnmount } from 'vue'
-import { NTag, NInput, NButton, NDataTable, NEmpty, useMessage, NSpace } from 'naive-ui'
+import { h, ref, computed } from 'vue'
+import { NTag, NInput, NButton, NDataTable, NEmpty, useMessage, NSpace, NPopover, NInputGroup } from 'naive-ui'
 import type { TableColumns } from 'naive-ui/lib/data-table/src/interface'
+import { useStore } from '../plugins/store'
 import { device } from '@/types/options'
 const message = useMessage() // 注册message方法
-const loading = ref(true)
+const store = useStore()
+// 表格加载动画
+const loading = computed<boolean>({
+  get() {
+    return store.get('devicesLoading')
+  },
+  set(val) {
+    store.set('devicesLoading', val)
+  }
+})
+// 数据表格的数据
+const data = computed<device[]>({
+  get() {
+    return store.get('devices') || []
+  },
+  set(val) {
+    store.set('devices', val)
+  }
+})
 // 数据表格渲染格式
 const columns: TableColumns = [
   {
     title: 'ID',
-    key: 'id'
+    key: 'id',
+    ellipsis: {
+      tooltip: true
+    }
   },
   {
     title: '名称',
-    key: 'name'
+    key: 'name',
+    ellipsis: {
+      tooltip: true
+    }
   },
   {
     title: '状态',
@@ -30,99 +55,79 @@ const columns: TableColumns = [
       )
     }
   },
-  // {
-  //   title: 'IP',
-  //   key: 'ip',
-  //   render(row) {
-  //     return h(
-  //       NInput,
-  //       {
-  //         props: {
-  //           value: row.ip,
-  //           disabled: isIP(row.id as string),
-  //           placeholder: '无线连接IP地址'
-  //         },
-  //         on: {
-  //           'update:value': (val: string) => row.ip = val
-  //         }
-  //       }
-  //     )
-  //   }
-  // },
   {
     title: '操作',
     key: 'operation',
-    render(row) {
-      const isWireless = isIP(row.id as string)
-      return h(
-        NSpace,
+    render(row: device) {
+      const isWireless = isIP(row.id)
+      return h(NSpace, {},
         {
-
-        },
-        [h(
-          NButton,
-          {
-            size: 'small',
-            strong: true,
-            type: isWireless ? 'error' : 'primary',
-            onClick: () => {
-              if (isWireless) {
-                // 向主线程发起断开连接请求
-                window.ipcRenderer.send('disconnect', row.id)
-              } else {
-                // 向主线程发起无线连接请求
-                if (!row.ip || !isIP(row.ip as string)) {
-                  message.warning('请检查ip地址')
-                  return
+          default: () => [
+            isWireless ? h(
+              NButton,
+              {
+                size: 'small',
+                strong: true,
+                type: 'error',
+                onClick: () => {
+                  // 向主线程发起断开连接请求
+                  window.ipcRenderer.send('device-disconnect', row.id)
                 }
-                // window.ipcRenderer.send('connect', row)
+              }, { default: () => '断开连接' }
+            ) : h(
+              NPopover,
+              {
+                trigger: 'click'
+              },
+              {
+                trigger: () => h(NButton, { size: 'small', strong: true, type: 'primary' }, { default: () => '打开无线连接' }),
+                default: () => h(NInputGroup, {}, {
+                  default: () => [
+                    h(NInput, { placeholder: '请输入IP', value: row.ip, 'onUpdate:value': (val: string) => row.ip = val }, {}),
+                    h(NButton, {
+                      type: 'primary', ghost: true,
+                      onClick: () => {
+                        if (!row.ip || !isIP(row.ip)) {
+                          message.warning('请检查ip地址')
+                          return
+                        }
+                        window.ipcRenderer.send('device-connect', { id: row.id, ip: row.ip })
+                      }
+                    }, { default: () => '连接' })
+                  ]
+                })
               }
-            }
-          },
-          {
-            default: () => isWireless ? '断开连接' : '打开无线连接',
-          }
-        ),
-        h(
-          NButton,
-          {
-            size: 'small',
-            strong: true,
-            type: 'info',
-            onClick: () => {
-              window.ipcRenderer.send('open', { config: {}, devices: [{ ...row }] })
-            }
-          },
-          {
-            default: () => '打开镜像'
-          }
-        )
-        ]
+            ),
+            // 打开镜像
+            h(
+              NButton,
+              {
+                size: 'small',
+                strong: true,
+                type: 'info',
+                onClick: () => {
+                  window.ipcRenderer.send('scrcpy-open', { config: {}, id: row.id })
+                }
+              },
+              {
+                default: () => '打开镜像'
+              }
+            )
+            // end 打开镜像
+          ]
+        }
       )
 
     }
   }
 ]
-let data = reactive<device[]>([]) // 数据表格的数据
 // 判断是否ip地址
-function isIP(str: string) {
-  return (/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(:\d{4})?$/).test(str)
+function isIP(str: any): str is string {
+  return (/^(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])(:([0-9]|[1-9]\d|[1-9]\d{2}|[1-9]\d{3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?$/).test(str)
 }
-
-onMounted(() => {
-  // 主线程发送过来的设备列表变动
-  window.ipcRenderer.on('devices', (event: any, devices: device[]) => {
-    data.length = 0 // 清空数组
-    data.push(...devices)
-    loading.value = false
-  })
-})
-onBeforeUnmount(() => {
-  window.ipcRenderer.removeAllListeners('devices')
-})
-
 // 初始化设备数据
-window.ipcRenderer.send('get-adb-devices')
+loading.value = true
+window.ipcRenderer.send('device-list')
 </script>
 <template>
   <NDataTable :columns="columns" :data="data" :row-key="row => row.id" :loading="loading">

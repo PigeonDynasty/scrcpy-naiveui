@@ -2,14 +2,34 @@ import fs from 'fs'
 import { IpcMainEvent } from 'electron'
 import { spawn } from 'child_process'
 import options from '@/types/options'
+import './fixShell'
 const argTemplete: object = {
-  title: '--window-title ${config.title}',
-  record: '--record ${config.recordpath}',
+  title: {
+    key: '--window-title',
+    configKey: 'title'
+  },
+  record: {
+    key: '--record',
+    configKey: 'recordpath'
+  },
   noDisplay: '--no-display',
-  bitRate: '${config.bitRate!==8?--bit-rate "${config.bitRate}M":""}',
-  maxSize: '--max-size ${config.maxSize}',
-  maxFps: '--max-fps ${maxFps}',
-  rotation: '--rotation ${config.rotation}',
+  bitRate: {
+    key: '--bit-rate',
+    configKey: 'bitRate',
+    suffix: 'M'
+  },
+  maxSize: {
+    key: '--max-size',
+    configKey: 'maxSize'
+  },
+  maxFps: {
+    key: '--max-fps',
+    configKey: 'maxFps'
+  },
+  rotation: {
+    key: '--rotation',
+    configKey: 'rotation'
+  },
   // 其他内容
   alwaysOnTop: '--always-on-top',// 窗口置顶
   noControl: '--no-control',// 电脑控制 不允许控制
@@ -23,11 +43,11 @@ const argTemplete: object = {
 export default ({ sender }: IpcMainEvent, opt: options) => {
   console.log('ipc open')
   const args: string[] = []
-  const { config, devices } = opt
+  const { config, id } = opt
   let cmd = 'scrcpy'
   if (config.source) { // 如果配置了scrcpy路径
     if (!fs.existsSync(config.source)) {
-      sender.send('error', { type: 'unknownScrcpyPathException' })
+      sender.send('scrcpy-error', { type: 'unknownScrcpyPathException' })
       return
     }
     cmd = config.source
@@ -37,8 +57,14 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
   // 添加启动参数
   type arg = keyof typeof argTemplete
   function addArg(key: string) {
-    if (argTemplete[key as arg]) {
-      args.push(eval(argTemplete[key as arg]))
+    const arg = argTemplete[key as arg]
+    if (arg) {
+      if (arg['key']) {
+        args.push(arg['key'])
+        args.push(String(config[arg['configKey']]) + arg['suffix'] || '')
+      } else {
+        args.push(arg)
+      }
     }
   }
   Object.keys(config).forEach(key => {
@@ -50,34 +76,33 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
       addArg(key)
     }
   })
-  // 处理模板
-  devices.forEach(({ id }) => {
-    const command = spawn(cmd, [...args, '-s', `${id}`])
-    let opened = false
-    let exited = false
-    command.stdout.on('data', (data) => {
-      if (!opened) {
-        sender.send('open', id)
-        opened = true
-      }
-      console.log(`stdout: ${data}`)
-    })
-    command.on('error', (code) => {
-      console.log(`child process close all stdio with code ${code}`)
-      command.kill()
-    })
-
-    command.on('close', (code) => {
-      console.log(`child process close all stdio with code ${code}`)
-    })
-
-    command.on('exit', (code) => {
-      console.log(`child process exited with code ${code}`)
-      if (!exited) {
-        sender.send('close', { success: code === 0, id })
-        command.kill()
-        exited = true
-      }
-    })
+  // devices.forEach(({ id }) => {
+  const command = spawn(cmd, [...args, '-s', `${id}`])
+  let opened = false
+  let exited = false
+  command.stdout.on('data', (data) => {
+    if (!opened) {
+      sender.send('scrcpy-opened', id)
+      opened = true
+    }
+    console.log(`stdout: ${data} ${id}`)
   })
+  command.on('error', (code) => {
+    console.log(`child process close all stdio with code ${code} ${id}`)
+    command.kill()
+  })
+
+  command.on('close', (code) => {
+    console.log(`child process close all stdio with code ${code}`)
+  })
+
+  command.on('exit', (code) => {
+    console.log(`child process exited with code ${code} ${id}`)
+    if (!exited) {
+      if (!sender.isDestroyed()) sender.send('scrcpy-closeed', { success: code === 0, id })
+      command.kill()
+      exited = true
+    }
+  })
+  // })
 }
