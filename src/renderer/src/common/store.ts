@@ -32,22 +32,24 @@ const dispatch = {
       !obj && (device.type = 'offline')
     })
     devices.forEach(device => {
-      dispatch.updateDevice(device)
+      dispatch.updateDevice(device, true)
     })
     state.devicesLoading = false
   },
   // 更新单个设备数据
-  updateDevice(device: device) {
-    state.devicesLoading = true
+  updateDevice(device: device, bol: boolean = false) {
+    !bol && (state.devicesLoading = true)
     const obj = state.devices.find(item => item.id === device.id)
     if (!obj) { // 不存在
       state.devices.push(device)
     } else { // 存在 遍历键 赋值
-      Object.keys(device).forEach(key => {
-        obj[key] = device[key]
-      })
+      // Object.keys(device).forEach(key => {
+      //   obj[key] = device[key]
+      // })
+      obj.name = device.name
+      obj.type = device.type
     }
-    state.devicesLoading = false
+    !bol && (state.devicesLoading = false)
   }
 }
 export default createSotore({

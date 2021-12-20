@@ -49,7 +49,18 @@ export default defineComponent({
 </template>
 
 <style>
-body {
-  padding: 0 20px 20px;
+.n-tabs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+.n-tabs .n-tab-pane {
+  height: calc(100% - 76px);
+  padding: 16px;
+  overflow: auto;
+  width: unset;
 }
 </style>
