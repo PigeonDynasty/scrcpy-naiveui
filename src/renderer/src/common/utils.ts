@@ -5,7 +5,7 @@ export function fileSelect(isDir: boolean = false, isMulti: boolean = false) {
     if (isMulti) args.push('multiSelections') // 是否多选
     window.ipcRenderer.send('file-select', args)
     window.ipcRenderer.once('file-selected', (event: any, paths: string[]) => {
-      resolve(isMulti ? paths : paths[0] as string)
+      resolve(isMulti ? paths : paths[0])
     })
   })
 }

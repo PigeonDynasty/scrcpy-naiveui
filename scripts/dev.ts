@@ -64,7 +64,7 @@ async function watchMain() {
         ],
       }).then(() => {
         console.groupEnd()
-        // console.clear()
+        console.clear()
         const server = chalk.bgBlueBright(' server ')
         const url = chalk.blueBright(`http://127.0.0.1:${process.env.PORT}`)
         console.group(server, `running in ${url}`)

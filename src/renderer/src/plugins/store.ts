@@ -37,7 +37,7 @@ class Store {
     })
   }
   get(key: string): any {
-    return this.state[key]
+    return JSON.parse(JSON.stringify(this.state[key])) // 去除绑定
   }
   set(key: string, val: any): void {
     this.state[key] = val

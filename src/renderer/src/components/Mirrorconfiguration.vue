@@ -1,11 +1,6 @@
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, reactive, ref } from 'vue'
 import {
-    NConfigProvider,
-    NMessageProvider,
-    NGlobalStyle,
-    NTabs,
-    NTabPane,
     NInput,
     NForm,
     NFormItemRow,
@@ -19,18 +14,12 @@ import {
     NCheckboxGroup,
     NDivider,
     NGrid,
-    NGridItem,
-    useOsTheme,
-    darkTheme
+    NGridItem
 } from 'naive-ui'
 import { fileSelect } from '../common/utils'
+import { useStore } from '../plugins/store'
 export default defineComponent({
     components: {
-        NConfigProvider,
-        NMessageProvider,
-        NGlobalStyle,
-        NTabs,
-        NTabPane,
         NInput,
         NForm,
         NFormItemRow,
@@ -47,9 +36,9 @@ export default defineComponent({
         NGridItem,
     },
     setup() {
-        const theme = computed(() => (useOsTheme().value === 'dark' ? darkTheme : null))
+        const store = useStore()
         return {
-            theme,
+            form: reactive(store.get('config')),
             active: ref(false),
             value: ref(false),
             BitRate: ref(0),
@@ -74,14 +63,13 @@ export default defineComponent({
                     value: 'angle3',
                 }
             ],
-            settings: ref(null),
-            recordPath: ref('')
+            settings: ref(null)
         }
     },
     methods: {
         selectRecordPath() {
             fileSelect().then(path => {
-                this.recordPath = path as string
+                this.form.source = path as string
             })
         }
     }
@@ -95,7 +83,7 @@ export default defineComponent({
         </n-form-item-row>
         <n-form-item-row label="Scrcpy程序路径" label-width="110">
             <n-input
-                v-model:value="recordPath"
+                v-model:value="form.source"
                 readonly
                 placeholder="Scrcpy文件夹路径-例如:C:\scrcpy-win64\scrcpy.exe"
                 @click="selectRecordPath"
@@ -157,7 +145,7 @@ export default defineComponent({
             </n-checkbox-group>
         </n-form-item-row>
         <n-divider />
-        <n-space style="text-align: center;">
+        <n-space justify="center">
             <n-button type="info">保存当前配置</n-button>
             <n-button type="primary">恢复默认配置</n-button>
         </n-space>

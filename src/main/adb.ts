@@ -27,8 +27,9 @@ function listAdbDevices({ sender }: IpcMainEvent) {
   })
 }
 // 设备列表变动监听
-function adbDevicesListener(webContents: BrowserWindow['webContents']) {
-  if (!webContents) return
+let adbTracker: any
+function addAdbDevicesListener(webContents: BrowserWindow['webContents']) {
+  if (!webContents || adbTracker) return
   client.trackDevices().then((tracker: any) => {
     // 全部修改操作
     tracker.on('change', async (device: device) => {
@@ -40,9 +41,13 @@ function adbDevicesListener(webContents: BrowserWindow['webContents']) {
     tracker.on('end', () => {
       console.log('Tracking stopped')
     })
+    adbTracker = tracker
   }).catch((err: any) => {
     console.error('Something went wrong:', err.stack)
   })
+}
+function removeAdbDevicesListener() {
+  adbTracker && adbTracker.end()
 }
 // 连接设备
 function adbConnect({ sender }: IpcMainEvent, device: device) {
@@ -79,9 +84,9 @@ function adbDisconnect({ sender }: IpcMainEvent, ip: string) {
   })
 }
 export {
-  getAdbDeviceInfo,
   listAdbDevices,
-  adbDevicesListener,
+  addAdbDevicesListener,
+  removeAdbDevicesListener,
   adbConnect,
   adbDisconnect
 }

@@ -2,7 +2,7 @@ import os from 'os'
 import fs from 'fs'
 import { join } from 'path'
 import { app, BrowserWindow, session, ipcMain, dialog } from 'electron'
-import { listAdbDevices, adbDevicesListener, adbConnect, adbDisconnect } from './adb'
+import { listAdbDevices, addAdbDevicesListener, removeAdbDevicesListener, adbConnect, adbDisconnect } from './adb'
 import scrcpy from './scrcpy'
 import { functions } from 'electron-log'
 Object.assign(console, functions)
@@ -79,7 +79,7 @@ async function bootstrap() {
   // 页面加载完成
   win.webContents.on('did-finish-load', () => {
     // 主线程与渲染线程通信
-    adbDevicesListener(win.webContents) // 监听设备列表变化
+    addAdbDevicesListener(win.webContents) // 监听设备列表变化
     ipcMain.on('scrcpy-open', scrcpy)
     ipcMain.on('device-connect', adbConnect)
     ipcMain.on('device-disconnect', adbDisconnect)
@@ -100,6 +100,7 @@ async function bootstrap() {
   })
   // 页面关闭 移除通信监听
   win.on('close', () => {
+    removeAdbDevicesListener()
     ipcMain.removeAllListeners('scrcpy-open')
     ipcMain.removeAllListeners('device-connect')
     ipcMain.removeAllListeners('device-disconnect')
