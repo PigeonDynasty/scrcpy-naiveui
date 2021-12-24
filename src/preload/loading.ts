@@ -23,7 +23,7 @@ export function useLoading() {
   height: 100%;
   width: 6px;
   display: inline-block;
-  animation: sk-stretchdelay 1.2s infinite ease-in-out;
+  animation: sk-stretch-delay 1.2s infinite ease-in-out;
 }
 .loading-animation > div + div{
   margin-left:6px;
@@ -44,12 +44,12 @@ export function useLoading() {
   animation-delay: -0.8s;
 }
 
-@-webkit-keyframes sk-stretchdelay {
+@-webkit-keyframes sk-stretch-delay {
   0%, 40%, 100% { -webkit-transform: scaleY(0.4) }  
   20% { -webkit-transform: scaleY(1.0) }
 }
 
-@keyframes sk-stretchdelay {
+@keyframes sk-stretch-delay {
   0%, 40%, 100% { 
     transform: scaleY(0.4);
     -webkit-transform: scaleY(0.4);

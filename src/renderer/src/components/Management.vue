@@ -7,7 +7,7 @@ import { device, config } from '@/types/options'
 const message = useMessage() // 注册message方法
 const store = useStore()
 // 配置文件
-const mconfig = computed<config>(() => store.get('config'))
+const mirrorConfig = computed<config>(() => store.get('config'))
 // 表格加载动画
 const loading = computed<boolean>({
   get() {
@@ -124,7 +124,7 @@ const columns: TableColumns = [
                     size: 'small',
                     type: 'info',
                     onClick: () => {
-                      window.ipcRenderer.send('scrcpy-open', { config: JSON.parse(JSON.stringify(mconfig.value)), id: row.id })
+                      window.ipcRenderer.send('scrcpy-open', { config: JSON.parse(JSON.stringify(mirrorConfig.value)), id: row.id })
                     }
                   },
                   { default: () => '打开镜像' }),
@@ -143,9 +143,9 @@ function isIP(str: string): boolean {
   return (/^(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])(:([0-9]|[1-9]\d|[1-9]\d{2}|[1-9]\d{3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?$/).test(str)
 }
 // 检查是否已经有对应无线连接的对象存在
-function hasWireless(ipadress: string | undefined): boolean {
-  if (!ipadress || !isIP(ipadress)) return false
-  const ip = ipadress.split(':')[0]
+function hasWireless(ipAddress: string | undefined): boolean {
+  if (!ipAddress || !isIP(ipAddress)) return false
+  const ip = ipAddress.split(':')[0]
   return data.value.some(device => {
     if (!isIP(device.id)) return false
     const dIp = device.id.split(':')[0]

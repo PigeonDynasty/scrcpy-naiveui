@@ -10,7 +10,7 @@ import {
   darkTheme
 } from 'naive-ui'
 import Management from './components/Management.vue'
-import MirrorConfiguration from './components/Mirrorconfiguration.vue'
+import MirrorConfiguration from './components/MirrorConfiguration.vue'
 export default defineComponent({
   components: {
     NConfigProvider,

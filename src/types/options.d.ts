@@ -22,7 +22,7 @@ declare interface config {
   source: string, // scrcpy路径
   record: boolean, // 镜像录屏
   noDisplay: boolean, // 录屏时打开镜像
-  recordpath: string // 录屏文件路径
+  recordPath: string // 录屏文件路径
   bitRate: number, // 比特率
   maxSize: number, // 等比最大分辨率
   maxFps: number, // 最大帧率

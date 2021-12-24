@@ -37,25 +37,25 @@ async function bootstrap() {
     //install vue devtool
     try {
       console.log(process.platform)
-      let devpath: string = ''
+      let devPath: string = ''
       switch (process.platform) {
         case 'darwin': // mac
-          devpath = '/Library/Application Support/Google/Chrome/Default/Extensions'
+          devPath = '/Library/Application Support/Google/Chrome/Default/Extensions'
           break
         case 'win32': // windows
-          devpath = '/AppData/Local/Google/Chrome/User Data/Default/Extensions'
+          devPath = '/AppData/Local/Google/Chrome/User Data/Default/Extensions'
           break
         case 'linux':
-          devpath = '/.config/google-chrome/Default/Extensions'
+          devPath = '/.config/google-chrome/Default/Extensions'
           break
       }
-      devpath += '/ljjemllljcmogpfapbkkighbhhppjdbg/' // 还需要取版本号文件夹 6.0.0.20_1
-      const devToolPath = join(os.homedir(), devpath)
-      const dirlist = fs.readdirSync(devToolPath) // 定位插件位置
+      devPath += '/ljjemllljcmogpfapbkkighbhhppjdbg/' // 还需要取版本号文件夹 6.0.0.20_1
+      const devToolPath = join(os.homedir(), devPath)
+      const dirList = fs.readdirSync(devToolPath) // 定位插件位置
       let versionPath = ''
       // for 方便跳出循环 查找版本号文件夹
-      for (let i = 0; i < dirlist.length; i++) {
-        const new_path = join(devToolPath, dirlist[i])
+      for (let i = 0; i < dirList.length; i++) {
+        const new_path = join(devToolPath, dirList[i])
         const stat = fs.statSync(new_path) //要检查是否为文件夹，需获取stat对象
         if (stat && stat.isDirectory()) {
           versionPath = new_path

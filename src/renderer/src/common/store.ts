@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import { createSotore } from '../plugins/store'
+import { createStore } from '../plugins/store'
 import { device, config } from '@/types/options'
 const devices: device[] = []
 const devicesLoading: boolean = false
@@ -8,7 +8,7 @@ const config: config = {
   source: '', // scrcpy路径
   record: false, // 镜像录屏
   noDisplay: false, // 录屏时打开镜像
-  recordpath: '', // 录屏文件路径
+  recordPath: '', // 录屏文件路径
   bitRate: 8, // 比特率
   maxSize: 0, // 等比最大分辨率
   maxFps: 0, // 最大帧率
@@ -52,7 +52,7 @@ const dispatch = {
     !bol && (state.devicesLoading = false)
   }
 }
-export default createSotore({
+export default createStore({
   state,
   dispatch
 })

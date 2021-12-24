@@ -1,4 +1,4 @@
-import { App, inject, watch, reactive } from 'vue'
+import { App, inject, watch } from 'vue'
 const storeName: string = 'scrcpy-naiveui'
 const local = () => {
   return {
@@ -25,7 +25,7 @@ class Store {
       this.state[key] = local().get()[key] || state[key] // 初始化数据
       watch(
         () => this.state[key],
-        (n) => { // 数据变动的时候往localstorage里存
+        (n) => { // 数据变动的时候往localStorage里存
           const data = local().get()
           data[key] = n
           local().set(data)
@@ -52,7 +52,7 @@ class Store {
     app.config.globalProperties.$store = this
   }
 }
-export function createSotore(opt: IStore): Store {
+export function createStore(opt: IStore): Store {
   return new Store(opt)
 }
 

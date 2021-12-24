@@ -7,14 +7,14 @@ let path: string = ''
 getShellPath().then((PATH: string) => {
   path = PATH || execSync(`echo $PATH`).toString().slice(0, -1)
 })
-const argTemplete: object = {
+const argTemplate: object = {
   title: {
     key: '--window-title',
     configKey: 'title'
   },
   record: {
     key: '--record',
-    configKey: 'recordpath'
+    configKey: 'recordPath'
   },
   noDisplay: '--no-display',
   bitRate: {
@@ -59,9 +59,9 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
   // 默认参数
   args.push('--shortcut-mod=lctrl,rctrl')
   // 添加启动参数
-  type arg = keyof typeof argTemplete
+  type arg = keyof typeof argTemplate
   function addArg(key: string) {
-    const arg = argTemplete[key as arg]
+    const arg = argTemplate[key as arg]
     if (arg) {
       if (arg['key'] && config[arg['configKey']]) {
         args.push(arg['key'])
@@ -107,7 +107,7 @@ export default ({ sender }: IpcMainEvent, opt: options) => {
   command.on('exit', (code) => {
     console.log(`child process exited with code ${code} ${id}`)
     if (!exited) {
-      !sender.isDestroyed() && sender.send('scrcpy-closeed', id)
+      !sender.isDestroyed() && sender.send('scrcpy-closed', id)
       command.kill()
       exited = true
     }

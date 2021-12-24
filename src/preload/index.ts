@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld('fs', fs)
 contextBridge.exposeInMainWorld('removeLoading', removeLoading)
 contextBridge.exposeInMainWorld('ipcRenderer', {
   ...ipcRenderer,
-  // `exposeInMainWorld` will not expose attribute and mothods from the prototype
+  // `exposeInMainWorld` will not expose attribute and methods from the prototype
   on(...args: Parameters<IpcRenderer['on']>) {
     return ipcRenderer.on(...args)
   },
