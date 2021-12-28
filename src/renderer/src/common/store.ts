@@ -12,7 +12,7 @@ const config: config = {
   bitRate: 8, // 比特率
   maxSize: 0, // 等比最大分辨率
   maxFps: 0, // 最大帧率
-  rotation: 0,// 旋转角度
+  rotation: 0, // 旋转角度
   other: [] // 其他配置
 }
 // 状态存储
@@ -40,9 +40,11 @@ const dispatch = {
   updateDevice(device: device, bol: boolean = false) {
     !bol && (state.devicesLoading = true)
     const obj = state.devices.find(item => item.id === device.id)
-    if (!obj) { // 不存在
+    if (!obj) {
+      // 不存在
       state.devices.push(device)
-    } else { // 存在 遍历键 赋值
+    } else {
+      // 存在 遍历键 赋值
       // Object.keys(device).forEach(key => {
       //   obj[key] = device[key]
       // })
@@ -50,6 +52,11 @@ const dispatch = {
       obj.type = device.type
     }
     !bol && (state.devicesLoading = false)
+  },
+  // 初始化配置
+  resetConfigToDefault(): Promise<config> {
+    state.config = config
+    return Promise.resolve(config)
   }
 }
 export default createStore({

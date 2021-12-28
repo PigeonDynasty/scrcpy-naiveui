@@ -12,7 +12,7 @@ const local = () => {
   }
 }
 interface IStore {
-  state: any,
+  state: any
   dispatch?: any
 }
 class Store {
@@ -21,20 +21,22 @@ class Store {
   constructor({ state, dispatch }: IStore) {
     this.state = state
     this._dispatch = dispatch
-    this.state && Object.keys(state).forEach(key => {
-      this.state[key] = local().get()[key] || state[key] // 初始化数据
-      watch(
-        () => this.state[key],
-        (n) => { // 数据变动的时候往localStorage里存
-          const data = local().get()
-          data[key] = n
-          local().set(data)
-        },
-        {
-          deep: true
-        }
-      )
-    })
+    this.state &&
+      Object.keys(state).forEach(key => {
+        this.state[key] = local().get()[key] || state[key] // 初始化数据
+        watch(
+          () => this.state[key],
+          n => {
+            // 数据变动的时候往localStorage里存
+            const data = local().get()
+            data[key] = n
+            local().set(data)
+          },
+          {
+            deep: true
+          }
+        )
+      })
   }
   get(key: string): any {
     return JSON.parse(JSON.stringify(this.state[key])) // 去除绑定
@@ -42,20 +44,25 @@ class Store {
   set(key: string, val: any): void {
     this.state[key] = val
   }
-  dispatch(key: string, ...args: any[]): void {
+  dispatch(key: string, ...args: any[]): Promise<any> {
     try {
-      this._dispatch[key] && this._dispatch[key](...args)
-    } catch { }
+      if (this._dispatch[key]) {
+        return this._dispatch[key](...args)
+      }
+    } catch {}
+    return Promise.reject(new Error(`${key} is not a function`))
   }
   install(app: App) {
     app.provide('store', this)
     app.config.globalProperties.$store = this
   }
 }
-export function createStore(opt: IStore): Store {
+function createStore(opt: IStore): Store {
   return new Store(opt)
 }
 
-export function useStore<T>(): T | any {
+function useStore<T>(): T | any {
   return inject('store')
 }
+
+export { createStore, useStore, Store }

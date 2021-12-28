@@ -1,6 +1,6 @@
 {
-  "appId": "com.takenokos.scrcpy-naiveui",
-  "productName": "scrcpy-naiveui",
+  "appId": "com.takenokos.ScrcpyNaiveui",
+  "productName": "ScrcpyNaiveui",
   "copyright": "Copyright © 2021 ${author}",
   "directories": {
     "output": "release"

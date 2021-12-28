@@ -11,6 +11,9 @@
     "nodebrew",
     "rctrl",
     "scrcpy",
-    "tcpip"
+    "tcpip",
+    "vfonts",
+    "vite",
+    "vitejs"
   ]
 }

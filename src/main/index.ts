@@ -2,7 +2,13 @@ import os from 'os'
 import fs from 'fs'
 import { join } from 'path'
 import { app, BrowserWindow, session, ipcMain, dialog } from 'electron'
-import { listAdbDevices, addAdbDevicesListener, removeAdbDevicesListener, adbConnect, adbDisconnect } from './adb'
+import {
+  listAdbDevices,
+  addAdbDevicesListener,
+  removeAdbDevicesListener,
+  adbConnect,
+  adbDisconnect
+} from './adb'
 import scrcpy from './scrcpy'
 import { functions } from 'electron-log'
 Object.assign(console, functions)
@@ -14,21 +20,20 @@ if (!app.requestSingleInstanceLock()) {
   app.quit()
   process.exit(0)
 }
-
 let win: BrowserWindow
 
 async function bootstrap() {
   win = new BrowserWindow({
-    height: 600,
-    width: 356,
+    height: 728,
+    width: 450,
     center: true,
     maximizable: false,
     fullscreenable: false,
     // show: false,
     webPreferences: {
       nodeIntegration: true,
-      preload: join(__dirname, '../preload/index.cjs'),
-    },
+      preload: join(__dirname, '../preload/index.cjs')
+    }
   })
   win.removeMenu() // 移除顶部菜单
   if (app.isPackaged) {
@@ -40,7 +45,8 @@ async function bootstrap() {
       let devPath: string = ''
       switch (process.platform) {
         case 'darwin': // mac
-          devPath = '/Library/Application Support/Google/Chrome/Default/Extensions'
+          devPath =
+            '/Library/Application Support/Google/Chrome/Default/Extensions'
           break
         case 'win32': // windows
           devPath = '/AppData/Local/Google/Chrome/User Data/Default/Extensions'
@@ -70,7 +76,6 @@ async function bootstrap() {
     win.loadURL(url)
     win.maximize()
     win.webContents.openDevTools()
-
   }
   // 窗口准备好打开
   win.on('ready-to-show', () => {
@@ -86,15 +91,13 @@ async function bootstrap() {
     ipcMain.on('device-list', listAdbDevices)
     // 选择文件
     ipcMain.on('file-select', ({ sender }, args) => {
-      dialog.showOpenDialog(
-        win, {
-        properties: args
-      }
-      ).then(({ canceled, filePaths }) => {
-        if (!canceled) {
+      dialog
+        .showOpenDialog(win, {
+          properties: args
+        })
+        .then(({ canceled, filePaths }) => {
           sender.send('file-selected', filePaths)
-        }
-      })
+        })
     })
     // end 通信部分
   })
